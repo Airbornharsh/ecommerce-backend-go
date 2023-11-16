@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/airbornharsh/ecommerce-backend-go/internal/database"
+	"github.com/airbornharsh/ecommerce-backend-go/pkg/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
@@ -19,11 +20,7 @@ func main() {
 
 	r := gin.New()
 
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello World!",
-		})
-	})
+	routes.Init(r)
 
 	r.Run(":8080")
 }
