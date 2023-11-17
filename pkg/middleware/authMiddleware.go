@@ -56,6 +56,8 @@ func UserTokenVerifyMiddleWare(c *gin.Context) {
 		return
 	}
 
+	user.Password = ""
+
 	c.Set("user", user)
 	c.Next()
 }
