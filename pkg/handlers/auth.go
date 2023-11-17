@@ -73,4 +73,54 @@ func RegisterHandler(c *gin.Context) {
 }
 
 func LoginHandler(c *gin.Context) {
+	type Login struct {
+		Username    string `json:"username"`
+		Email       string `json:"email"`
+		PhoneNumber string `json:"phone_number"`
+		Password    string `json:"password"`
+	}
+
+	var tempUser Login
+	var user models.User
+
+	err := c.BindJSON(&tempUser)
+	if helpers.ErrorResponse(c, err, 400) {
+		return
+	}
+
+	q := `SELECT * FROM users WHERE username = '` + tempUser.Username + `' OR email = '` + tempUser.Email + `' OR phone_number = '` + tempUser.PhoneNumber + `';`
+
+	rows, err := database.DB.Query(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	for rows.Next() {
+		err := rows.Scan(&user.UserID, &user.Username, &user.PhoneNumber, &user.Password, &user.Email, &user.Role)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+
+		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(tempUser.Password))
+		if helpers.ErrorResponse(c, err, 401) {
+			return
+		}
+
+		token, err := helpers.GenerateToken(&user)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+
+		c.Writer.Header().Set("Authorization", token)
+		c.JSON(200, gin.H{
+			"message": "User Logged In Successfully",
+			"token":   token,
+			"userData": gin.H{
+				"username":     user.Username,
+				"phone_number": user.PhoneNumber,
+				"email":        user.Email,
+				"role":         user.Role,
+			},
+		})
+	}
 }
