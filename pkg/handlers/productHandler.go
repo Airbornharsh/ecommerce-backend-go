@@ -188,5 +188,30 @@ func PutProductsHandler(c *gin.Context) {
 }
 
 func DeleteProductsHandler(c *gin.Context) {
+	tempAdmin, exists := c.Get("admin")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
 
+	q := "DELETE FROM products WHERE product_id = " + c.Param("id") + ";"
+
+	_, err := database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	admin := tempAdmin.(models.User)
+	token, err := helpers.GenerateToken(&admin)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
+	c.JSON(200, gin.H{
+		"message": "Product Deleted",
+		"token":   token,
+	})
 }

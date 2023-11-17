@@ -17,5 +17,5 @@ func ProductInit(r *gin.RouterGroup) {
 	//admin
 	products.POST("/", middlewares.AdminTokenVerifyMiddleWare, handlers.PostProductsHandler)
 	products.PUT("/:id", middlewares.AdminTokenVerifyMiddleWare, handlers.PutProductsHandler)
-	products.DELETE("/:id", handlers.DeleteProductsHandler)
+	products.DELETE("/:id", middlewares.AdminTokenVerifyMiddleWare, handlers.DeleteProductsHandler)
 }
