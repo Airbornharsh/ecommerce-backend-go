@@ -53,15 +53,15 @@ func UpdateUserHandler(c *gin.Context) {
 		return
 	}
 
-	if newUser.Username == "" && newUser.Email == "" && newUser.PhoneNumber == "" {
+	if newUser.Name == "" && newUser.Email == "" && newUser.PhoneNumber == "" {
 		c.JSON(200, gin.H{
 			"message": "Nothing to Update",
 		})
 		return
 	}
 
-	if newUser.Username == "" {
-		newUser.Username = user.Username
+	if newUser.Name == "" {
+		newUser.Name = user.Name
 	}
 
 	if newUser.Email == "" {
@@ -72,7 +72,7 @@ func UpdateUserHandler(c *gin.Context) {
 		newUser.PhoneNumber = user.PhoneNumber
 	}
 
-	q := `UPDATE users SET username = '` + newUser.Username + `', email = '` + newUser.Email + `', phone_number = '` + newUser.PhoneNumber + `' WHERE user_id = ` + strconv.Itoa(int(user.UserID)) + `;`
+	q := `UPDATE users SET name = '` + newUser.Name + `', email = '` + newUser.Email + `', phone_number = '` + newUser.PhoneNumber + `' WHERE user_id = ` + strconv.Itoa(int(user.UserID)) + `;`
 
 	_, err = database.DB.Exec(q)
 	if helpers.ErrorResponse(c, err, 500) {

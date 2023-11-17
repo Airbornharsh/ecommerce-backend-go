@@ -30,7 +30,7 @@ func UserTokenVerifyMiddleWare(c *gin.Context) {
 
 	var user models.User
 
-	q := `SELECT user_id, username, email, phone_number, role FROM users WHERE user_id = ` + strconv.Itoa(int(tempUser.UserID)) + `;`
+	q := `SELECT user_id, name, email, phone_number, role FROM users WHERE user_id = ` + strconv.Itoa(int(tempUser.UserID)) + `;`
 
 	rows, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -39,7 +39,7 @@ func UserTokenVerifyMiddleWare(c *gin.Context) {
 	}
 
 	for rows.Next() {
-		err := rows.Scan(&user.UserID, &user.Username, &user.Email, &user.PhoneNumber, &user.Role)
+		err := rows.Scan(&user.UserID, &user.Name, &user.Email, &user.PhoneNumber, &user.Role)
 		if helpers.ErrorResponse(c, err, 500) {
 			c.Abort()
 			return
@@ -83,7 +83,7 @@ func AdminTokenVerifyMiddleWare(c *gin.Context) {
 
 	var user models.User
 
-	q := `SELECT user_id, username, email, phone_number, role FROM users WHERE user_id = ` + strconv.Itoa(int(tempUser.UserID)) + `;`
+	q := `SELECT user_id, name, email, phone_number, role FROM users WHERE user_id = ` + strconv.Itoa(int(tempUser.UserID)) + `;`
 
 	rows, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -92,7 +92,7 @@ func AdminTokenVerifyMiddleWare(c *gin.Context) {
 	}
 
 	for rows.Next() {
-		err := rows.Scan(&user.UserID, &user.Username, &user.Email, &user.PhoneNumber, &user.Role)
+		err := rows.Scan(&user.UserID, &user.Name, &user.Email, &user.PhoneNumber, &user.Role)
 		if helpers.ErrorResponse(c, err, 500) {
 			c.Abort()
 			return

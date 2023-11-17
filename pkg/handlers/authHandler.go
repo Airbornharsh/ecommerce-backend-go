@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/airbornharsh/ecommerce-backend-go/internal/database"
 	"github.com/airbornharsh/ecommerce-backend-go/pkg/helpers"
 	"github.com/airbornharsh/ecommerce-backend-go/pkg/models"
@@ -9,6 +11,7 @@ import (
 )
 
 func RegisterHandler(c *gin.Context) {
+	fmt.Println("Error:")
 	var user models.User
 
 	err := c.BindJSON(&user)
@@ -16,7 +19,7 @@ func RegisterHandler(c *gin.Context) {
 		return
 	}
 
-	q := `SELECT EXISTS (SELECT 1 FROM users WHERE username = '` + user.Username + `' OR email = '` + user.Email + `' OR phone_number = '` + user.PhoneNumber + `');`
+	q := `SELECT EXISTS (SELECT 1 FROM users WHERE email = '` + user.Email + `' OR phone_number = '` + user.PhoneNumber + `');`
 
 	var exists bool
 	rows, err := database.DB.Query(q)
@@ -47,7 +50,7 @@ func RegisterHandler(c *gin.Context) {
 	user.Password = string(hashedPassword)
 	user.Role = "user"
 
-	q = `INSERT INTO users (username, phone_number, password, email, role) VALUES ('` + user.Username + `', '` + user.PhoneNumber + `', '` + user.Password + `', '` + user.Email + `', '` + user.Role + `');`
+	q = `INSERT INTO users (name, phone_number, password, email, role) VALUES ('` + user.Name + `', '` + user.PhoneNumber + `', '` + user.Password + `', '` + user.Email + `', '` + user.Role + `');`
 
 	_, err = database.DB.Exec(q)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -64,7 +67,7 @@ func RegisterHandler(c *gin.Context) {
 		"message": "User Registered Successfully",
 		"token":   token,
 		"userData": gin.H{
-			"username":     user.Username,
+			"name":         user.Name,
 			"phone_number": user.PhoneNumber,
 			"email":        user.Email,
 			"role":         user.Role,
@@ -74,7 +77,7 @@ func RegisterHandler(c *gin.Context) {
 
 func LoginHandler(c *gin.Context) {
 	type Login struct {
-		Username    string `json:"username"`
+		Name        string `json:"name"`
 		Email       string `json:"email"`
 		PhoneNumber string `json:"phone_number"`
 		Password    string `json:"password"`
@@ -88,7 +91,7 @@ func LoginHandler(c *gin.Context) {
 		return
 	}
 
-	q := `SELECT * FROM users WHERE username = '` + tempUser.Username + `' OR email = '` + tempUser.Email + `' OR phone_number = '` + tempUser.PhoneNumber + `';`
+	q := `SELECT * FROM users WHERE name = '` + tempUser.Name + `' OR email = '` + tempUser.Email + `' OR phone_number = '` + tempUser.PhoneNumber + `';`
 
 	rows, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -96,7 +99,7 @@ func LoginHandler(c *gin.Context) {
 	}
 
 	for rows.Next() {
-		err := rows.Scan(&user.UserID, &user.Username, &user.PhoneNumber, &user.Password, &user.Email, &user.Role)
+		err := rows.Scan(&user.UserID, &user.Name, &user.PhoneNumber, &user.Password, &user.Email, &user.Role)
 		if helpers.ErrorResponse(c, err, 500) {
 			return
 		}
@@ -116,7 +119,7 @@ func LoginHandler(c *gin.Context) {
 			"message": "User Logged In Successfully",
 			"token":   token,
 			"userData": gin.H{
-				"username":     user.Username,
+				"name":         user.Name,
 				"phone_number": user.PhoneNumber,
 				"email":        user.Email,
 				"role":         user.Role,

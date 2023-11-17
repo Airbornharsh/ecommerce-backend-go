@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"time"
 
 	"github.com/airbornharsh/ecommerce-backend-go/pkg/models"
 	"github.com/dgrijalva/jwt-go"
@@ -23,10 +24,11 @@ func GenerateToken(user *models.User) (string, error) {
 
 	claims := jwt.MapClaims{
 		"user_id":      user.UserID,
-		"username":     user.Username,
+		"name":         user.Name,
 		"email":        user.Email,
 		"phone_number": user.PhoneNumber,
 		"role":         user.Role,
+		"exp":          time.Now().Add(24 * time.Hour).Unix(),
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -59,8 +61,8 @@ func GetClaims(c *gin.Context, tokenString string) (models.User, error) {
 		return user, fmt.Errorf("user id not found in claims")
 	}
 
-	userName, userNameOk := claims["username"].(string)
-	if !userNameOk {
+	name, nameOk := claims["name"].(string)
+	if !nameOk {
 		fmt.Println("User Name not found in claims")
 		return user, fmt.Errorf("user name not found in claims")
 	}
@@ -84,7 +86,7 @@ func GetClaims(c *gin.Context, tokenString string) (models.User, error) {
 	}
 
 	user.UserID = uint(userId)
-	user.Username = userName
+	user.Name = name
 	user.Email = email
 	user.PhoneNumber = phoneNumber
 	user.Role = role
