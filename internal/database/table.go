@@ -76,7 +76,7 @@ func CreateProductTable(db *sql.DB) {
 func CreateUserProductTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS userproducts (
 		userproduct_id serial PRIMARY KEY,
-		product_id INT NOT NULL references products(product_id),
+		product_id INT NOT NULL references products(product_id) ON DELETE CASCADE,
 		quantity INT NOT NULL,
 		order_id INT NOT NULL
 	);`
@@ -90,7 +90,7 @@ func CreateUserProductTable(db *sql.DB) {
 func CreateAddressTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS addresses (
 		address_id serial PRIMARY KEY,
-		user_id INT NOT NULL references users(user_id),
+		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
 		street VARCHAR ( 255 ) NOT NULL,
 		city VARCHAR ( 50 ) NOT NULL,
 		state VARCHAR ( 50 ) NOT NULL,
@@ -108,9 +108,9 @@ func CreateAddressTable(db *sql.DB) {
 func CreateShippingTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS shippings (
 		shipping_id serial PRIMARY KEY,
-		user_id INT NOT NULL references users(user_id),
+		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
 		method VARCHAR ( 50 ) NOT NULL,
-		address_id INT NOT NULL references addresses(address_id),
+		address_id INT NOT NULL references addresses(address_id) ON DELETE CASCADE,
 		estimated_delivery_days INT NOT NULL
 	);`
 
@@ -123,7 +123,7 @@ func CreateShippingTable(db *sql.DB) {
 func CreatePaymentTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS payments (
 		payment_id serial PRIMARY KEY,
-		user_id INT NOT NULL references users(user_id),
+		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
 		method VARCHAR ( 50 ) NOT NULL,
 		status VARCHAR ( 50 ) NOT NULL,
 		amount INT NOT NULL,
@@ -139,10 +139,10 @@ func CreatePaymentTable(db *sql.DB) {
 func CreateOrderTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS orders (
 		order_id serial PRIMARY KEY,
-		user_id INT NOT NULL references users(user_id),
+		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
 		total_amount INT NOT NULL,
-		payment_id INT NOT NULL references payments(payment_id),
-		shipping_id INT NOT NULL references shippings(shipping_id),
+		payment_id INT NOT NULL references payments(payment_id) ON DELETE CASCADE,
+		shipping_id INT NOT NULL references shippings(shipping_id) ON DELETE CASCADE,
 		status VARCHAR ( 50 ) NOT NULL,
 		order_date TIMESTAMP NOT NULL,
 		delivery_date TIMESTAMP NOT NULL
@@ -157,8 +157,8 @@ func CreateOrderTable(db *sql.DB) {
 func CreateOrderItemTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS orderitems (
 		orderitem_id serial PRIMARY KEY,
-		order_id INT NOT NULL references orders(order_id),
-		product_id INT NOT NULL references products(product_id),
+		order_id INT NOT NULL references orders(order_id) ON DELETE CASCADE,
+		product_id INT NOT NULL references products(product_id) ON DELETE CASCADE,
 		quantity INT NOT NULL
 	);`
 
@@ -171,8 +171,8 @@ func CreateOrderItemTable(db *sql.DB) {
 func CreateCartItemTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS cartitems (
 		cartitem_id serial PRIMARY KEY,
-		user_id INT NOT NULL references users(user_id),
-		product_id INT NOT NULL references products(product_id),
+		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
+		product_id INT NOT NULL references products(product_id) ON DELETE CASCADE,
 		quantity INT NOT NULL
 	);`
 
@@ -185,8 +185,8 @@ func CreateCartItemTable(db *sql.DB) {
 func CreateWishlistItemTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS wishlistitems (
 		wishlistitem_id serial PRIMARY KEY,
-		user_id INT NOT NULL references users(user_id),
-		product_id INT NOT NULL references products(product_id)
+		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
+		product_id INT NOT NULL references products(product_id) ON DELETE CASCADE
 	);`
 
 	_, err := db.Exec(q)
@@ -198,8 +198,8 @@ func CreateWishlistItemTable(db *sql.DB) {
 func CreateReviewTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS reviews (
 		review_id serial PRIMARY KEY,
-		user_id INT NOT NULL references users(user_id),
-		product_id INT NOT NULL references products(product_id),
+		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
+		product_id INT NOT NULL references products(product_id) ON DELETE CASCADE,
 		rating INT NOT NULL,
 		comment VARCHAR ( 255 ) NOT NULL
 	);`
