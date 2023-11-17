@@ -69,7 +69,7 @@ func AdminTokenVerifyMiddleWare(c *gin.Context) {
 		c.JSON(401, gin.H{
 			"message": "Unauthorized",
 		})
-		c.Set("user", nil)
+		c.Set("admin", nil)
 
 		c.Abort()
 		return
@@ -103,7 +103,7 @@ func AdminTokenVerifyMiddleWare(c *gin.Context) {
 		c.JSON(401, gin.H{
 			"message": "Unauthorized",
 		})
-		c.Set("user", nil)
+		c.Set("admin", nil)
 
 		c.Abort()
 		return
@@ -113,10 +113,10 @@ func AdminTokenVerifyMiddleWare(c *gin.Context) {
 		c.JSON(401, gin.H{
 			"message": "Unauthorized",
 		})
-		c.Set("user", nil)
+		c.Set("admin", nil)
 		c.Abort()
 	}
 
-	c.Set("user", user)
+	c.Set("admin", user)
 	c.Next()
 }
