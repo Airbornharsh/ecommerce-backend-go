@@ -51,8 +51,36 @@ func GetAllCategoryHandler(c *gin.Context) {
 }
 
 func GetCategoryHandler(c *gin.Context) {
+	tempUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
+
+	var category models.Category
+
+	q := "SELECT * FROM categories WHERE category_id = " + c.Param("id") + ";"
+
+	row := database.DB.QueryRow(q)
+
+	err := row.Scan(&category.CategoryID, &category.Name)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	user := tempUser.(models.User)
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
 	c.JSON(200, gin.H{
-		"message": "GetCategoryHandler",
+		"message":  "Category Found",
+		"token":    token,
+		"category": category,
 	})
 }
 
