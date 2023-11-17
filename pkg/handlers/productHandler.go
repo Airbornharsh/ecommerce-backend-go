@@ -130,6 +130,60 @@ func PostProductsHandler(c *gin.Context) {
 }
 
 func PutProductsHandler(c *gin.Context) {
+	tempAdmin, exists := c.Get("admin")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
+
+	var newProduct models.Product
+
+	err := c.ShouldBindJSON(&newProduct)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	q := "UPDATE products SET "
+	if newProduct.Name != "" {
+		q += "name = '" + newProduct.Name + "', "
+	}
+	if newProduct.Description != "" {
+		q += "description = '" + newProduct.Description + "', "
+	}
+	if newProduct.Price != 0 {
+		q += "price = " + strconv.Itoa(int(newProduct.Price)) + ", "
+	}
+	if newProduct.CategoryID != 0 {
+		q += "category_id = " + strconv.Itoa(int(newProduct.CategoryID)) + ", "
+	}
+	if newProduct.Image != "" {
+		q += "image = '" + newProduct.Image + "', "
+	}
+	if newProduct.Quantity != 0 {
+		q += "quantity = " + strconv.Itoa(int(newProduct.Quantity)) + ", "
+	}
+
+	q = q[:len(q)-2]
+	q += " WHERE product_id = " + c.Param("id") + ";"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	admin := tempAdmin.(models.User)
+	token, err := helpers.GenerateToken(&admin)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
+	c.JSON(200, gin.H{
+		"message": "Product Updated",
+		"token":   token,
+	})
 
 }
 
