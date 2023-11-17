@@ -85,8 +85,38 @@ func GetCategoryHandler(c *gin.Context) {
 }
 
 func CreateCategoryHandler(c *gin.Context) {
+	tempAdmin, exists := c.Get("admin")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
+
+	var category models.Category
+
+	err := c.ShouldBindJSON(&category)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	q := "INSERT INTO categories (name) VALUES ('" + category.Name + "');"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	admin := tempAdmin.(models.User)
+	token, err := helpers.GenerateToken(&admin)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
 	c.JSON(200, gin.H{
-		"message": "CreateCategoryHandler",
+		"message": "Category Created",
+		"token":   token,
 	})
 }
 
