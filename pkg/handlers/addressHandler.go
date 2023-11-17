@@ -23,7 +23,7 @@ func GetAllAddressHandler(c *gin.Context) {
 	var addresses []models.Address
 
 	q := "SELECT * FROM addresses WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "'"
-	
+
 	row, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -54,7 +54,38 @@ func GetAllAddressHandler(c *gin.Context) {
 }
 
 func GetAddressHandler(c *gin.Context) {
+	tempUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
 
+	user := tempUser.(models.User)
+
+	var address models.Address
+
+	q := "SELECT * FROM addresses WHERE address_id = " + c.Param("id") + " AND user_id = '" + strconv.Itoa(int(user.UserID)) + "';"
+
+	row := database.DB.QueryRow(q)
+
+	err := row.Scan(&address.AddressID, &address.UserID, &address.Street, &address.City, &address.State, &address.Country, &address.ZipCode, &address.IsDefault)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
+	c.JSON(200, gin.H{
+		"message": "Address Found",
+		"token":   token,
+		"address": address,
+	})
 }
 
 func CreateAddressHandler(c *gin.Context) {
