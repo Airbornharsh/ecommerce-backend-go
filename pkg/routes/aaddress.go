@@ -6,8 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AddressInit(api *gin.RouterGroup) {
-	user := api.Group("/user")
+func AddressInit(user *gin.RouterGroup) {
 	address := user.Group("/address")
 
 	address.GET("/", middlewares.UserTokenVerifyMiddleWare, handlers.GetAllAddressHandler)

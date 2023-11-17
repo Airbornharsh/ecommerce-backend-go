@@ -6,6 +6,7 @@ import (
 
 func Init(r *gin.Engine) {
 	api := r.Group("/api")
+	user := api.Group("/user")
 
 	api.GET("/",
 		func(c *gin.Context) {
@@ -13,9 +14,11 @@ func Init(r *gin.Engine) {
 				"message": "Api Server",
 			})
 		})
+		
 
 	AuthInit(api)
 	ProductInit(api)
 	CategoryInit(api)
-	AddressInit(api)
+	AddressInit(user)
+	CartInit(user)
 }
