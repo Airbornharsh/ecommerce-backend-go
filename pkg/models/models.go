@@ -32,33 +32,6 @@ type UserProduct struct {
 	OrderID       uint `json:"order_id"`
 }
 
-type Shipping struct {
-	ShippingID            uint   `json:"shipping_id"`
-	UserID                uint   `json:"user_id"`
-	Method                string `json:"method"` // "standard", "express", etc.
-	AddressID             uint   `json:"address_id"`
-	EstimatedDeliveryDays int    `json:"estimated_delivery_days"`
-	// Other shipping-related fields
-}
-
-type Order struct {
-	OrderID      uint      `json:"order_id"`
-	UserID       uint      `json:"user_id"`
-	TotalAmount  uint      `json:"total_amount"`
-	PaymentID    uint      `json:"payment_id"`
-	ShippingID   uint      `json:"shipping_id"`
-	Status       string    `json:"status"` // "pending", "shipped", "delivered", etc.
-	OrderDate    time.Time `json:"order_date"`
-	DeliveryDate time.Time `json:"delivery_date"`
-}
-
-type OrderItem struct {
-	OrderItemID uint `json:"orderitem_id"`
-	OrderID     uint `json:"order_id"`
-	ProductID   uint `json:"product_id"`
-	Quantity    int  `json:"quantity"`
-}
-
 type Address struct {
 	AddressID uint   `json:"address_id"`
 	UserID    uint   `json:"user_id"`
@@ -68,6 +41,14 @@ type Address struct {
 	Country   string `json:"country"`
 	ZipCode   string `json:"zip_code"`
 	IsDefault bool   `json:"is_default"`
+}
+type Shipping struct {
+	ShippingID            uint   `json:"shipping_id"`
+	UserID                uint   `json:"user_id"`
+	Method                string `json:"method"` // "standard", "express", etc.
+	AddressID             uint   `json:"address_id"`
+	EstimatedDeliveryDays int    `json:"estimated_delivery_days"`
+	// Other shipping-related fields
 }
 
 type PaymentMethod string
@@ -96,6 +77,24 @@ type Payment struct {
 	Method        PaymentMethod `json:"method"`
 	TransactionID string        `json:"transaction_id"`
 	Status        PaymentStatus `json:"status"`
+}
+
+type Order struct {
+	OrderID      uint      `json:"order_id"`
+	UserID       uint      `json:"user_id"`
+	TotalAmount  uint      `json:"total_amount"`
+	PaymentID    uint      `json:"payment_id"`
+	ShippingID   uint      `json:"shipping_id"`
+	Status       string    `json:"status"` // "pending", "shipped", "delivered", etc.
+	OrderDate    time.Time `json:"order_date"`
+	DeliveryDate time.Time `json:"delivery_date"`
+}
+
+type OrderItem struct {
+	OrderItemID uint `json:"orderitem_id"`
+	OrderID     uint `json:"order_id"`
+	ProductID   uint `json:"product_id"`
+	Quantity    int  `json:"quantity"`
 }
 
 type CartItem struct {

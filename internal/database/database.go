@@ -22,6 +22,9 @@ func DBInit() {
 	fmt.Println("Connected to database")
 
 	DB = db
+
+	// MakeTable(DB)
+	// DropTable(DB)
 }
 
 func GetDb() (*sql.DB, error) {
