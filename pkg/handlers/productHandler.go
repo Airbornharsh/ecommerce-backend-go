@@ -20,9 +20,20 @@ func GetProductsHandler(c *gin.Context) {
 
 	q := "SELECT * FROM products"
 
-	err := database.DB.QueryRow(q).Scan(&products)
+	row, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
+	}
+
+	for row.Next() {
+		var product models.Product
+
+		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Image, &product.Quantity)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+
+		products = append(products, product)
 	}
 
 	user := tempUser.(models.User)
