@@ -128,7 +128,63 @@ func CreateAddressHandler(c *gin.Context) {
 }
 
 func UpdateAddressHandler(c *gin.Context) {
+	tempUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
 
+	user := tempUser.(models.User)
+
+	var address models.Address
+
+	err := c.ShouldBindJSON(&address)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	q := "UPDATE addresses SET "
+
+	if address.Street != "" {
+		q += "street = '" + address.Street + "', "
+	}
+	if address.City != "" {
+		q += "city = '" + address.City + "', "
+	}
+	if address.State != "" {
+		q += "state = '" + address.State + "', "
+	}
+	if address.Country != "" {
+		q += "country = '" + address.Country + "', "
+	}
+	if address.ZipCode != "" {
+		q += "zip_code = '" + address.ZipCode + "', "
+	}
+	if address.IsDefault {
+		q += "is_default = '" + strconv.FormatBool(address.IsDefault) + "', "
+	}
+
+	q = q[:len(q)-2]
+
+	q += " WHERE address_id = " + c.Param("id") + " AND user_id = '" + strconv.Itoa(int(user.UserID)) + "';"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
+	c.JSON(200, gin.H{
+		"message": "Address Updated",
+		"token":   token,
+	})
 }
 
 func DeleteAddressHandler(c *gin.Context) {
