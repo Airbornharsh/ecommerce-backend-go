@@ -121,8 +121,45 @@ func CreateCategoryHandler(c *gin.Context) {
 }
 
 func UpdateCategoryHandler(c *gin.Context) {
+	tempAdmin, exists := c.Get("admin")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
+
+	var category models.Category
+
+	err := c.ShouldBindJSON(&category)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	if category.Name == "" {
+		c.JSON(400, gin.H{
+			"message": "Name is required",
+		})
+		return
+	}
+
+	q := "UPDATE categories SET name = '" + category.Name + "' WHERE category_id = " + c.Param("id") + ";"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	admin := tempAdmin.(models.User)
+	token, err := helpers.GenerateToken(&admin)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
 	c.JSON(200, gin.H{
-		"message": "UpdateCategoryHandler",
+		"message": "Category Updated",
+		"token":   token,
 	})
 }
 
