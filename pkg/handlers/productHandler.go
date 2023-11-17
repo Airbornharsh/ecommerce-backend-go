@@ -88,9 +88,48 @@ func GetProductHandler(c *gin.Context) {
 	})
 }
 
-// func FilterCategoryHandler(c *gin.Context) {
+func FilterCategoryHandler(c *gin.Context) {
+	tempUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
 
-// }
+	var products []models.Product
+
+	q := "SELECT * FROM products WHERE category_id = " + c.Param("category") + ";"
+
+	row, err := database.DB.Query(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	for row.Next() {
+		var product models.Product
+
+		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Image, &product.Quantity)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+
+		products = append(products, product)
+	}
+
+	user := tempUser.(models.User)
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
+	c.JSON(200, gin.H{
+		"message":  "Products Found",
+		"token":    token,
+		"products": products,
+	})
+}
 
 func PostProductsHandler(c *gin.Context) {
 	tempAdmin, exists := c.Get("admin")

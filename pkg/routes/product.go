@@ -12,7 +12,7 @@ func ProductInit(r *gin.RouterGroup) {
 	//user && UnAuth
 	products.GET("/", middlewares.UserTokenVerifyMiddleWare, handlers.GetProductsHandler)
 	products.GET("/:id", middlewares.UserTokenVerifyMiddleWare, handlers.GetProductHandler)
-	// products.GET("/filter/:category", handlers.FilterCategoryHandler)
+	products.GET("/filter/:category", middlewares.UserTokenVerifyMiddleWare, handlers.FilterCategoryHandler)
 
 	//admin
 	products.POST("/", middlewares.AdminTokenVerifyMiddleWare, handlers.PostProductsHandler)
