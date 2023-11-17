@@ -9,10 +9,10 @@ func AuthInit(r *gin.RouterGroup) {
 	auth := r.Group("/auth")
 
 	//unAuth
-	auth.POST("/register", handlers.Register)
-	auth.POST("/login", handlers.Login)
+	auth.POST("/register", handlers.RegisterHandler)
+	auth.POST("/login", handlers.LoginHandler)
 
 	//Auth
-	auth.GET("/user", handlers.GetUser)
-	auth.PUT("/user", handlers.UpdateUser)
+	auth.GET("/user", handlers.GetUserHandler)
+	auth.PUT("/user", handlers.UpdateUserHandler)
 }

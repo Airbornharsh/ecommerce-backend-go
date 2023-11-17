@@ -9,12 +9,12 @@ func ProductInit(r *gin.RouterGroup) {
 	products := r.Group("/products")
 
 	//user && UnAuth
-	products.GET("/", handlers.GetProducts)
-	products.GET("/:id", handlers.GetProduct)
-	products.GET("/filter/:category", handlers.FilterCategory)
+	products.GET("/", handlers.GetProductsHandler)
+	products.GET("/:id", handlers.GetProductHandler)
+	products.GET("/filter/:category", handlers.FilterCategoryHandler)
 
 	//admin
-	products.POST("/", handlers.PostProducts)
-	products.PUT("/:id", handlers.PutProducts)
-	products.DELETE("/:id", handlers.DeleteProducts)
+	products.POST("/", handlers.PostProductsHandler)
+	products.PUT("/:id", handlers.PutProductsHandler)
+	products.DELETE("/:id", handlers.DeleteProductsHandler)
 }

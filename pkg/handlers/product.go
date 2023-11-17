@@ -2,26 +2,26 @@ package handlers
 
 import "github.com/gin-gonic/gin"
 
-func GetProducts(c *gin.Context) {
+func GetProductsHandler(c *gin.Context) {
 
 }
 
-func GetProduct(c *gin.Context) {
+func GetProductHandler(c *gin.Context) {
 
 }
 
-func FilterCategory(c *gin.Context){
+func FilterCategoryHandler(c *gin.Context) {
 
 }
 
-func PostProducts(c *gin.Context) {
+func PostProductsHandler(c *gin.Context) {
 
 }
 
-func PutProducts(c *gin.Context) {
+func PutProductsHandler(c *gin.Context) {
 
 }
 
-func DeleteProducts(c *gin.Context) {
+func DeleteProductsHandler(c *gin.Context) {
 
 }

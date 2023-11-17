@@ -3,11 +3,12 @@ package models
 import "time"
 
 type User struct {
-	UserID   uint   `json:"user_id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Role     string `json:"role"`
+	UserID      uint   `json:"user_id"`
+	Username    string `json:"username"`
+	PhoneNumber string `json:"phone_number"`
+	Password    string `json:"password"`
+	Email       string `json:"email"`
+	Role        string `json:"role"`
 }
 
 type Product struct {
