@@ -62,7 +62,7 @@ func CreateProductTable(db *sql.DB) {
 		name VARCHAR ( 50 ) NOT NULL,
 		description VARCHAR ( 255 ) NOT NULL,
 		price INT NOT NULL,
-		category_id INT NOT NULL references categories(category_id),
+		category_id INT NOT NULL references categories(category_id) ON DELETE CASCADE,
 		image VARCHAR ( 255 ) NOT NULL,
 		quantity INT NOT NULL
 	);`

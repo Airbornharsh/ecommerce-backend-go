@@ -164,7 +164,30 @@ func UpdateCategoryHandler(c *gin.Context) {
 }
 
 func DeleteCategoryHandler(c *gin.Context) {
+	tempAdmin, exists := c.Get("admin")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
+
+	q := "DELETE FROM categories WHERE category_id = " + c.Param("id") + ";"
+
+	_, err := database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	admin := tempAdmin.(models.User)
+	token, err := helpers.GenerateToken(&admin)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
 	c.JSON(200, gin.H{
-		"message": "DeleteCategoryHandler",
+		"message": "Category Deleted",
+		"token":   token,
 	})
 }
