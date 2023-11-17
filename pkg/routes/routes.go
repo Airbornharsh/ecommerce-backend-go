@@ -16,4 +16,5 @@ func Init(r *gin.Engine) {
 
 	AuthInit(api)
 	ProductInit(api)
+	
 }
