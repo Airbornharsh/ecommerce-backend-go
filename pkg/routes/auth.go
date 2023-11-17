@@ -15,5 +15,5 @@ func AuthInit(r *gin.RouterGroup) {
 
 	//Auth
 	auth.GET("/user", middlewares.UserTokenVerifyMiddleWare, handlers.GetUserHandler)
-	auth.PUT("/user", handlers.UpdateUserHandler)
+	auth.PUT("/user", middlewares.UserTokenVerifyMiddleWare, handlers.UpdateUserHandler)
 }
