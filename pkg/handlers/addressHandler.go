@@ -89,7 +89,42 @@ func GetAddressHandler(c *gin.Context) {
 }
 
 func CreateAddressHandler(c *gin.Context) {
+	tempUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "Unauthorized",
+		})
+		return
+	}
 
+	user := tempUser.(models.User)
+
+	var address models.Address
+
+	err := c.ShouldBindJSON(&address)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	address.IsDefault = false
+
+	q := "INSERT INTO addresses (user_id, street, city, state, country, zip_code, is_default) VALUES ('" + strconv.Itoa(int(user.UserID)) + "', '" + address.Street + "', '" + address.City + "', '" + address.State + "', '" + address.Country + "', '" + address.ZipCode + "', '" + strconv.FormatBool(address.IsDefault) + "');"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
+	c.JSON(200, gin.H{
+		"message": "Address Created",
+		"token":   token,
+	})
 }
 
 func UpdateAddressHandler(c *gin.Context) {
