@@ -101,14 +101,14 @@ type OrderItem struct {
 type CartItem struct {
 	CartItemID uint `json:"cartitem_id"`
 	UserID     uint `json:"user_id"`
-	ProductID  uint `json:"productId"`
+	ProductID  uint `json:"product_id"`
 	Quantity   int  `json:"quantity"`
 }
 
 type WishlistItem struct {
 	WishlistItemID uint `json:"wishlistitem_id"`
 	UserID         uint `json:"user_id"`
-	ProductID      uint `json:"productId"`
+	ProductID      uint `json:"product_id"`
 }
 
 type Review struct {

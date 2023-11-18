@@ -103,27 +103,34 @@ func LoginHandler(c *gin.Context) {
 		if helpers.ErrorResponse(c, err, 500) {
 			return
 		}
-
-		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(tempUser.Password))
-		if helpers.ErrorResponse(c, err, 401) {
-			return
-		}
-
-		token, err := helpers.GenerateToken(&user)
-		if helpers.ErrorResponse(c, err, 500) {
-			return
-		}
-
-		c.Writer.Header().Set("Authorization", token)
-		c.JSON(200, gin.H{
-			"message": "User Logged In Successfully",
-			"token":   token,
-			"userData": gin.H{
-				"name":         user.Name,
-				"phone_number": user.PhoneNumber,
-				"email":        user.Email,
-				"role":         user.Role,
-			},
-		})
 	}
+
+	if user.UserID == 0 {
+		c.JSON(200, gin.H{
+			"message": "User Does Not Exist",
+		})
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(tempUser.Password))
+	if helpers.ErrorResponse(c, err, 401) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
+	c.JSON(200, gin.H{
+		"message": "User Logged In Successfully",
+		"token":   token,
+		"userData": gin.H{
+			"name":         user.Name,
+			"phone_number": user.PhoneNumber,
+			"email":        user.Email,
+			"role":         user.Role,
+		},
+	})
 }
