@@ -10,16 +10,7 @@ import (
 )
 
 func GetUserHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	token, err := helpers.GenerateToken(&user)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -35,16 +26,7 @@ func GetUserHandler(c *gin.Context) {
 }
 
 func UpdateUserHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	var newUser models.User
 
