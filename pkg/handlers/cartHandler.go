@@ -9,6 +9,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type CartItem struct {
+	CartItemID  uint   `json:"cartitem_id"`
+	UserID      uint   `json:"user_id"`
+	ProductID   uint   `json:"product_id"`
+	Quantity    int    `json:"quantity"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       uint   `json:"price"`
+	CategoryID  uint   `json:"category_id"`
+	Category    string `json:"category"`
+	Image       string `json:"image"`
+}
+
 func GetCartHandler(c *gin.Context) {
 	tempUser, exists := c.Get("user")
 	if !exists {
@@ -19,19 +32,6 @@ func GetCartHandler(c *gin.Context) {
 	}
 
 	user := tempUser.(models.User)
-
-	type CartItem struct {
-		CartItemID  uint   `json:"cartitem_id"`
-		UserID      uint   `json:"user_id"`
-		ProductID   uint   `json:"product_id"`
-		Quantity    int    `json:"quantity"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
-		Price       uint   `json:"price"`
-		CategoryID  uint   `json:"category_id"`
-		Category    string `json:"category"`
-		Image       string `json:"image"`
-	}
 
 	var cartItems []CartItem
 
