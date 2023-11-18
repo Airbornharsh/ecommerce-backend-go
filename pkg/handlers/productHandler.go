@@ -9,6 +9,17 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type Product struct {
+	ProductID   uint   `json:"product_id"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Price       uint   `json:"price"`
+	CategoryID  uint   `json:"category_id"`
+	Category    string `json:"category"`
+	Image       string `json:"image"`
+	Quantity    uint   `json:"quantity"`
+}
+
 func GetProductsHandler(c *gin.Context) {
 	tempUser, exists := c.Get("user")
 	if !exists {
@@ -18,9 +29,9 @@ func GetProductsHandler(c *gin.Context) {
 		return
 	}
 
-	var products []models.Product
+	var products []Product
 
-	q := "SELECT * FROM products"
+	q := "SELECT p.product_id, p.name, p.description, p.price, p.category_id, cat.name, p.image, p.quantity FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id;"
 
 	row, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -28,9 +39,9 @@ func GetProductsHandler(c *gin.Context) {
 	}
 
 	for row.Next() {
-		var product models.Product
+		var product Product
 
-		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Image, &product.Quantity)
+		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity)
 		if helpers.ErrorResponse(c, err, 500) {
 			return
 		}
@@ -62,13 +73,13 @@ func GetProductHandler(c *gin.Context) {
 		return
 	}
 
-	var product models.Product
+	var product Product
 
-	q := "SELECT * FROM products WHERE product_id = " + c.Param("id") + ";"
+	q := "SELECT  p.product_id, p.name, p.description, p.price, p.category_id, cat.name, p.image, p.quantity  FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id WHERE product_id = " + c.Param("id") + ";"
 
 	row := database.DB.QueryRow(q)
 
-	err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Image, &product.Quantity)
+	err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity)
 
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -97,9 +108,9 @@ func FilterCategoryHandler(c *gin.Context) {
 		return
 	}
 
-	var products []models.Product
+	var products []Product
 
-	q := "SELECT * FROM products WHERE category_id = " + c.Param("category") + ";"
+	q := "SELECT  p.product_id, p.name, p.description, p.price, p.category_id, cat.name, p.image, p.quantity  FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id WHERE category_id = " + c.Param("category") + ";"
 
 	row, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -107,9 +118,9 @@ func FilterCategoryHandler(c *gin.Context) {
 	}
 
 	for row.Next() {
-		var product models.Product
+		var product Product
 
-		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Image, &product.Quantity)
+		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity)
 		if helpers.ErrorResponse(c, err, 500) {
 			return
 		}
