@@ -49,13 +49,69 @@ func GetCartHandler(c *gin.Context) {
 		cartItems = append(cartItems, cartItem)
 	}
 
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
 	c.JSON(200, gin.H{
+		"message":   "Cart items retrieved successfully",
 		"cartItems": cartItems,
+		"token":     token,
 	})
 }
 
 func AddProductCartHandler(c *gin.Context) {
+	tempUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
 
+	user := tempUser.(models.User)
+
+	var cartItem CartItem
+
+	err := c.ShouldBindJSON(&cartItem)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	q := "SELECT EXISTS (SELECT 1 FROM cartitems WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND product_id = '" + c.Param("productId") + "');"
+
+	row := database.DB.QueryRow(q)
+
+	var existsInCart bool
+
+	err = row.Scan(&existsInCart)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	if existsInCart {
+		q = "UPDATE cartitems SET quantity = quantity + " + strconv.Itoa(cartItem.Quantity) + " WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND product_id = '" + c.Param("productId") + "';"
+	} else {
+		q = "INSERT INTO cartitems (user_id, product_id, quantity) VALUES ('" + strconv.Itoa(int(user.UserID)) + "', '" + c.Param("productId") + "', '" + strconv.Itoa(cartItem.Quantity) + "');"
+	}
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
+	c.JSON(200, gin.H{
+		"message": "Product added to cart",
+		"token":   token,
+	})
 }
 
 func UpdateProductCartHandler(c *gin.Context) {

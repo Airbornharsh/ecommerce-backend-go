@@ -172,7 +172,7 @@ func CreateCartItemTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS cartitems (
 		cartitem_id serial PRIMARY KEY,
 		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
-		product_id INT NOT NULL references products(product_id) ON DELETE CASCADE,
+		product_id INT  NOT NULL references products(product_id) ON DELETE CASCADE,
 		quantity INT NOT NULL
 	);`
 
@@ -216,7 +216,9 @@ func DropTable(db *sql.DB) {
 		panic(err.Error())
 	}
 
-	q := `DROP TABLE IF EXISTS users, categories, products, userproducts, addresses, shippings, payments, orders, orderitems, cartitems, wishlistitems, reviews;`
+	// q := `DROP TABLE IF EXISTS users, categories, products, userproducts, addresses, shippings, payments, orders, orderitems, cartitems, wishlistitems, reviews;`
+
+	q := `DROP TABLE IF EXISTS cartitems`
 
 	_, err = db.Exec(q)
 	if err != nil {
