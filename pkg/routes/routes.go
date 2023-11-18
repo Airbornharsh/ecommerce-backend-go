@@ -14,11 +14,11 @@ func Init(r *gin.Engine) {
 				"message": "Api Server",
 			})
 		})
-		
 
 	AuthInit(api)
 	ProductInit(api)
 	CategoryInit(api)
 	AddressInit(user)
 	CartInit(user)
+	ReviewInit(user)
 }
