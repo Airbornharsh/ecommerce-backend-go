@@ -21,13 +21,7 @@ type Product struct {
 }
 
 func GetProductsHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	user := c.MustGet("user").(models.User)
 
 	var products []Product
 
@@ -49,8 +43,6 @@ func GetProductsHandler(c *gin.Context) {
 		products = append(products, product)
 	}
 
-	user := tempUser.(models.User)
-
 	token, err := helpers.GenerateToken(&user)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -65,13 +57,7 @@ func GetProductsHandler(c *gin.Context) {
 }
 
 func GetProductHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	user := c.MustGet("user").(models.User)
 
 	var product Product
 
@@ -85,7 +71,6 @@ func GetProductHandler(c *gin.Context) {
 		return
 	}
 
-	user := tempUser.(models.User)
 	token, err := helpers.GenerateToken(&user)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -100,13 +85,7 @@ func GetProductHandler(c *gin.Context) {
 }
 
 func FilterCategoryHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	user := c.MustGet("user").(models.User)
 
 	var products []Product
 
@@ -128,7 +107,6 @@ func FilterCategoryHandler(c *gin.Context) {
 		products = append(products, product)
 	}
 
-	user := tempUser.(models.User)
 	token, err := helpers.GenerateToken(&user)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -143,13 +121,7 @@ func FilterCategoryHandler(c *gin.Context) {
 }
 
 func PostProductsHandler(c *gin.Context) {
-	tempAdmin, exists := c.Get("admin")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	admin := c.MustGet("admin").(models.User)
 
 	var product models.Product
 
@@ -165,7 +137,6 @@ func PostProductsHandler(c *gin.Context) {
 		return
 	}
 
-	admin := tempAdmin.(models.User)
 	token, err := helpers.GenerateToken(&admin)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -180,13 +151,7 @@ func PostProductsHandler(c *gin.Context) {
 }
 
 func PutProductsHandler(c *gin.Context) {
-	tempAdmin, exists := c.Get("admin")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	admin := c.MustGet("admin").(models.User)
 
 	var newProduct models.Product
 
@@ -223,7 +188,6 @@ func PutProductsHandler(c *gin.Context) {
 		return
 	}
 
-	admin := tempAdmin.(models.User)
 	token, err := helpers.GenerateToken(&admin)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -238,13 +202,7 @@ func PutProductsHandler(c *gin.Context) {
 }
 
 func DeleteProductsHandler(c *gin.Context) {
-	tempAdmin, exists := c.Get("admin")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	admin := c.MustGet("admin").(models.User)
 
 	q := "DELETE FROM products WHERE product_id = " + c.Param("id") + ";"
 
@@ -253,7 +211,6 @@ func DeleteProductsHandler(c *gin.Context) {
 		return
 	}
 
-	admin := tempAdmin.(models.User)
 	token, err := helpers.GenerateToken(&admin)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
