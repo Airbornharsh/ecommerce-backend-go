@@ -152,7 +152,33 @@ func UpdateProductCartHandler(c *gin.Context) {
 }
 
 func DeleteProductCartHandler(c *gin.Context) {
+	tempUser, exists := c.Get("user")
+	if !exists {
+		c.JSON(401, gin.H{
+			"message": "unauthorized",
+		})
+		return
+	}
 
+	user := tempUser.(models.User)
+
+	q := "DELETE FROM cartitems WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND product_id = '" + c.Param("productId") + "';"
+
+	_, err := database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.Writer.Header().Set("Authorization", token)
+	c.JSON(200, gin.H{
+		"message": "Product deleted from cart",
+		"token":   token,
+	})
 }
 
 func DeleteCartHandler(c *gin.Context) {
