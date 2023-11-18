@@ -23,15 +23,7 @@ type CartItem struct {
 }
 
 func GetCartHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	var cartItems []CartItem
 
@@ -63,15 +55,7 @@ func GetCartHandler(c *gin.Context) {
 }
 
 func AddProductCartHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	var cartItem CartItem
 
@@ -115,15 +99,7 @@ func AddProductCartHandler(c *gin.Context) {
 }
 
 func UpdateProductCartHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	var cartItem CartItem
 
@@ -152,15 +128,7 @@ func UpdateProductCartHandler(c *gin.Context) {
 }
 
 func DeleteProductCartHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	q := "DELETE FROM cartitems WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND product_id = '" + c.Param("productId") + "';"
 
@@ -182,15 +150,7 @@ func DeleteProductCartHandler(c *gin.Context) {
 }
 
 func DeleteCartHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	q := "DELETE FROM cartitems WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "';"
 
