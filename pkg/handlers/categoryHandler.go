@@ -8,13 +8,7 @@ import (
 )
 
 func GetAllCategoryHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	user := c.MustGet("user").(models.User)
 
 	var categories []models.Category
 
@@ -36,7 +30,6 @@ func GetAllCategoryHandler(c *gin.Context) {
 		categories = append(categories, category)
 	}
 
-	user := tempUser.(models.User)
 	token, err := helpers.GenerateToken(&user)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -51,13 +44,7 @@ func GetAllCategoryHandler(c *gin.Context) {
 }
 
 func GetCategoryHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	user := c.MustGet("user").(models.User)
 
 	var category models.Category
 
@@ -70,7 +57,6 @@ func GetCategoryHandler(c *gin.Context) {
 		return
 	}
 
-	user := tempUser.(models.User)
 	token, err := helpers.GenerateToken(&user)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -85,13 +71,7 @@ func GetCategoryHandler(c *gin.Context) {
 }
 
 func CreateCategoryHandler(c *gin.Context) {
-	tempAdmin, exists := c.Get("admin")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	admin := c.MustGet("admin").(models.User)
 
 	var category models.Category
 
@@ -107,7 +87,6 @@ func CreateCategoryHandler(c *gin.Context) {
 		return
 	}
 
-	admin := tempAdmin.(models.User)
 	token, err := helpers.GenerateToken(&admin)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -121,13 +100,7 @@ func CreateCategoryHandler(c *gin.Context) {
 }
 
 func UpdateCategoryHandler(c *gin.Context) {
-	tempAdmin, exists := c.Get("admin")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	admin := c.MustGet("admin").(models.User)
 
 	var category models.Category
 
@@ -150,7 +123,6 @@ func UpdateCategoryHandler(c *gin.Context) {
 		return
 	}
 
-	admin := tempAdmin.(models.User)
 	token, err := helpers.GenerateToken(&admin)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
@@ -164,13 +136,7 @@ func UpdateCategoryHandler(c *gin.Context) {
 }
 
 func DeleteCategoryHandler(c *gin.Context) {
-	tempAdmin, exists := c.Get("admin")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
+	admin := c.MustGet("admin").(models.User)
 
 	q := "DELETE FROM categories WHERE category_id = " + c.Param("id") + ";"
 
@@ -179,7 +145,6 @@ func DeleteCategoryHandler(c *gin.Context) {
 		return
 	}
 
-	admin := tempAdmin.(models.User)
 	token, err := helpers.GenerateToken(&admin)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
