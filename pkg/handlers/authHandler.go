@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	"github.com/airbornharsh/ecommerce-backend-go/internal/database"
 	"github.com/airbornharsh/ecommerce-backend-go/pkg/helpers"
 	"github.com/airbornharsh/ecommerce-backend-go/pkg/models"
@@ -11,7 +9,6 @@ import (
 )
 
 func RegisterHandler(c *gin.Context) {
-	fmt.Println("Error:")
 	var user models.User
 
 	err := c.BindJSON(&user)
