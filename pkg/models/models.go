@@ -73,7 +73,6 @@ const (
 type Payment struct {
 	PaymentID     uint          `json:"payment_id"`
 	UserID        uint          `json:"user_id"`
-	OrderID       uint          `json:"order_id"`
 	Amount        uint          `json:"amount"`
 	Method        PaymentMethod `json:"method"`
 	TransactionID string        `json:"transaction_id"`
