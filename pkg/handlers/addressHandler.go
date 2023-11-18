@@ -10,15 +10,7 @@ import (
 )
 
 func GetAllAddressHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	var addresses []models.Address
 
@@ -54,15 +46,7 @@ func GetAllAddressHandler(c *gin.Context) {
 }
 
 func GetAddressHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	var address models.Address
 
@@ -89,15 +73,7 @@ func GetAddressHandler(c *gin.Context) {
 }
 
 func CreateAddressHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	var address models.Address
 
@@ -128,15 +104,7 @@ func CreateAddressHandler(c *gin.Context) {
 }
 
 func UpdateAddressHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	var address models.Address
 
@@ -188,15 +156,7 @@ func UpdateAddressHandler(c *gin.Context) {
 }
 
 func DeleteAddressHandler(c *gin.Context) {
-	tempUser, exists := c.Get("user")
-	if !exists {
-		c.JSON(401, gin.H{
-			"message": "Unauthorized",
-		})
-		return
-	}
-
-	user := tempUser.(models.User)
+	user := c.MustGet("user").(models.User)
 
 	q := "DELETE FROM addresses WHERE address_id = " + c.Param("id") + " AND user_id = '" + strconv.Itoa(int(user.UserID)) + "';"
 
