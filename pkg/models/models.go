@@ -76,7 +76,6 @@ type Payment struct {
 	UserID        uint          `json:"user_id"`
 	Amount        uint          `json:"amount"`
 	Method        PaymentMethod `json:"method"`
-	TransactionID string        `json:"transaction_id"`
 	Status        PaymentStatus `json:"status"`
 	CreatedAt     time.Time     `json:"created_at"`
 }
