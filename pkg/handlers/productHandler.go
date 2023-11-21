@@ -66,21 +66,7 @@ func GetProductHandler(c *gin.Context) {
 	// q := "SELECT  p.product_id, p.name, p.description, p.price, p.category_id, cat.name, p.image, p.quantity , AVG(r.rating) as avg_rating FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id LEFT JOIN reviews r ON r.product_id = p.product_id WHERE product_id = " + c.Param("id") + ";"
 
 	q := `
-	SELECT
-		p.product_id, p.name, p.description, p.price,
-		p.category_id, cat.name as category_name, p.image,
-		p.quantity, AVG(reviews.rating) as avg_rating
-	FROM
-		products p
-	INNER JOIN
-		categories cat ON p.category_id = cat.category_id
-	LEFT JOIN
-		reviews ON reviews.product_id = p.product_id
-	WHERE
-		p.product_id = '` + c.Param("id") + `'
-	GROUP BY
-		p.product_id, cat.name;
-	`
+	SELECT p.product_id, p.name, p.description, p.price, p.category_id, cat.name as category_name, p.image, p.quantity, AVG(reviews.rating) as avg_rating FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id LEFT JOIN reviews ON reviews.product_id = p.product_id WHERE p.product_id = '` + c.Param("id") + `' GROUP BY p.product_id, cat.name;`	
 
 	row := database.DB.QueryRow(q)
 
