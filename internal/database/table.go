@@ -188,7 +188,7 @@ func CreateWishlistTable(db *sql.DB) {
 		wishlist_id serial PRIMARY KEY,
 		name VARCHAR ( 50 ) NOT NULL,
 		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
-		defaultproduct_id INT NOT NULL references products(product_id) ON DELETE CASCADE
+		defaultproduct_id INT references products(product_id) ON DELETE CASCADE
 	);`
 
 	_, err := db.Exec(q)

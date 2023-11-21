@@ -116,17 +116,17 @@ type CartItem struct {
 }
 
 type Wishlist struct {
-	WishlistID       uint `json:"wishlist_id"`
-	Name             uint `json:"name"`
-	UserID           uint `json:"user_id"`
-	DefaultProductID uint `json:"defaultproduct_id"`
+	WishlistID       uint   `json:"wishlist_id"`
+	Name             string `json:"name"`
+	UserID           uint   `json:"user_id"`
+	DefaultProductID uint   `json:"defaultproduct_id"`
 }
 
 type WishlistItem struct {
 	WishlistItemID uint `json:"wishlistitem_id"`
 	UserID         uint `json:"user_id"`
 	ProductID      uint `json:"product_id"`
-	WishlistID       uint `json:"wishlist_id"`
+	WishlistID     uint `json:"wishlist_id"`
 }
 
 type Review struct {
