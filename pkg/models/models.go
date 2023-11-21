@@ -59,6 +59,7 @@ const (
 	PaymentMethodDebitCard      PaymentMethod = "debit_card"
 	PaymentMethodNetBanking     PaymentMethod = "net_banking"
 	PaymentMethodCashOnDelivery PaymentMethod = "cash_on_delivery"
+	PaymentMethodUPI            PaymentMethod = "upi"
 )
 
 type PaymentStatus string
