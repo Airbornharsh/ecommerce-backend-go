@@ -10,6 +10,36 @@ import (
 )
 
 func GetAllReviewHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
+
+	q := "SELECT * FROM reviews WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "'"
+
+	rows, err := database.DB.Query(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	var reviews []models.Review
+
+	for rows.Next() {
+		var review models.Review
+		err = rows.Scan(&review.ReviewID, &review.UserID, &review.ProductID, &review.Rating, &review.Comment)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+		reviews = append(reviews, review)
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Reviews fetched successfully",
+		"token":   token,
+		"reviews": reviews,
+	})
 }
 
 func GetAllProductReviewHandler(c *gin.Context) {
