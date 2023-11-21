@@ -21,6 +21,7 @@ func MakeTable(db *sql.DB) {
 	CreateOrderTable(db)
 	CreateOrderItemTable(db)
 	CreateCartItemTable(db)
+	CreateWishlistTable(db)
 	CreateWishlistItemTable(db)
 	CreateReviewTable(db)
 
@@ -182,11 +183,26 @@ func CreateCartItemTable(db *sql.DB) {
 	}
 }
 
+func CreateWishlistTable(db *sql.DB) {
+	q := `CREATE TABLE IF NOT EXISTS wishlists (
+		wishlist_id serial PRIMARY KEY,
+		name VARCHAR ( 50 ) NOT NULL,
+		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
+		defaultproduct_id INT NOT NULL references products(product_id) ON DELETE CASCADE
+	);`
+
+	_, err := db.Exec(q)
+	if err != nil {
+		panic(err.Error())
+	}
+}
+
 func CreateWishlistItemTable(db *sql.DB) {
 	q := `CREATE TABLE IF NOT EXISTS wishlistitems (
 		wishlistitem_id serial PRIMARY KEY,
 		user_id INT NOT NULL references users(user_id) ON DELETE CASCADE,
-		product_id INT NOT NULL references products(product_id) ON DELETE CASCADE
+		product_id INT NOT NULL references products(product_id) ON DELETE CASCADE,
+		wishlist_id INT NOT NULL references wishlists(wishlist_id) ON DELETE CASCADE
 	);`
 
 	_, err := db.Exec(q)
@@ -218,7 +234,7 @@ func DropTable(db *sql.DB) {
 
 	// q := `DROP TABLE IF EXISTS users, categories, products, userproducts, addresses, shippings, payments, orders, orderitems, cartitems, wishlistitems, reviews;`
 
-	q := `DROP TABLE IF EXISTS cartitems`
+	q := `DROP TABLE IF EXISTS wishlistitems`
 
 	_, err = db.Exec(q)
 	if err != nil {

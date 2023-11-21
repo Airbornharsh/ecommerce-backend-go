@@ -72,12 +72,12 @@ const (
 )
 
 type Payment struct {
-	PaymentID     uint          `json:"payment_id"`
-	UserID        uint          `json:"user_id"`
-	Amount        uint          `json:"amount"`
-	Method        PaymentMethod `json:"method"`
-	Status        PaymentStatus `json:"status"`
-	CreatedAt     time.Time     `json:"created_at"`
+	PaymentID uint          `json:"payment_id"`
+	UserID    uint          `json:"user_id"`
+	Amount    uint          `json:"amount"`
+	Method    PaymentMethod `json:"method"`
+	Status    PaymentStatus `json:"status"`
+	CreatedAt time.Time     `json:"created_at"`
 }
 
 type OrderStatus string
@@ -115,10 +115,18 @@ type CartItem struct {
 	Quantity   int  `json:"quantity"`
 }
 
+type Wishlist struct {
+	WishlistID       uint `json:"wishlist_id"`
+	Name             uint `json:"name"`
+	UserID           uint `json:"user_id"`
+	DefaultProductID uint `json:"defaultproduct_id"`
+}
+
 type WishlistItem struct {
 	WishlistItemID uint `json:"wishlistitem_id"`
 	UserID         uint `json:"user_id"`
 	ProductID      uint `json:"product_id"`
+	WishlistID       uint `json:"wishlist_id"`
 }
 
 type Review struct {
