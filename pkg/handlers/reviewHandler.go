@@ -12,18 +12,35 @@ import (
 func GetAllReviewHandler(c *gin.Context) {
 	user := c.MustGet("user").(models.User)
 
-	q := "SELECT * FROM reviews WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "'"
+	// q := "SELECT * FROM reviews WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "'"
+
+	q := "SELECT reviews.review_id, reviews.user_id, reviews.product_id, products.name, products.description, products.price, products.category_id, categories.name, products.image, products.quantity, reviews.rating, reviews.comment FROM reviews INNER JOIN products ON reviews.product_id = products.product_id INNER JOIN categories ON products.category_id = categories.category_id WHERE reviews.user_id = '" + strconv.Itoa(int(user.UserID)) + "'"
 
 	rows, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
 	}
 
-	var reviews []models.Review
+	type Review struct {
+		ReviewID           uint   `json:"review_id"`
+		UserID             uint   `json:"user_id"`
+		ProductID          uint   `json:"product_id"`
+		ProductName        string `json:"product_name"`
+		ProductDescription string `json:"product_description"`
+		ProductPrice       uint   `json:"product_price"`
+		ProductCategoryID  uint   `json:"product_category_id"`
+		ProductCategory    string `json:"product_category"`
+		ProductImage       string `json:"product_image"`
+		ProductQuantity    uint   `json:"product_quantity"`
+		Rating             uint   `json:"rating"`
+		Comment            string `json:"comment"`
+	}
+
+	var reviews []Review
 
 	for rows.Next() {
-		var review models.Review
-		err = rows.Scan(&review.ReviewID, &review.UserID, &review.ProductID, &review.Rating, &review.Comment)
+		var review Review
+		err = rows.Scan(&review.ReviewID, &review.UserID, &review.ProductID, &review.ProductName, &review.ProductDescription, &review.ProductPrice, &review.ProductCategoryID, &review.ProductCategory, &review.ProductImage, &review.ProductQuantity, &review.Rating, &review.Comment)
 		if helpers.ErrorResponse(c, err, 500) {
 			return
 		}
