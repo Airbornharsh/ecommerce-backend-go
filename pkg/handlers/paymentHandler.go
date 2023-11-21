@@ -131,3 +131,9 @@ func CancelPaymentHandler(c *gin.Context) {
 		"token":   token,
 	})
 }
+
+func ListPaymentStatusHandler(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"payment_status": []string{"pending", "failed", "success", "cancelled"},
+	})
+}

@@ -14,4 +14,5 @@ func PaymentInit(user *gin.RouterGroup) {
 	payment.PUT("/success/:paymentId", middlewares.UserTokenVerifyMiddleWare, handlers.SuccessPaymentHandler)
 	payment.PUT("/cancel/:paymentId", middlewares.UserTokenVerifyMiddleWare, handlers.CancelPaymentHandler)
 
+	payment.GET("/", handlers.ListPaymentStatusHandler)
 }
