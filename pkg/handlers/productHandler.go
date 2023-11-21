@@ -10,14 +10,15 @@ import (
 )
 
 type Product struct {
-	ProductID   uint   `json:"product_id"`
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Price       uint   `json:"price"`
-	CategoryID  uint   `json:"category_id"`
-	Category    string `json:"category"`
-	Image       string `json:"image"`
-	Quantity    uint   `json:"quantity"`
+	ProductID   uint    `json:"product_id"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Price       uint    `json:"price"`
+	CategoryID  uint    `json:"category_id"`
+	Category    string  `json:"category"`
+	Image       string  `json:"image"`
+	Quantity    uint    `json:"quantity"`
+	Rating      float64 `json:"avg_rating"`
 }
 
 func GetProductsHandler(c *gin.Context) {
@@ -61,11 +62,28 @@ func GetProductHandler(c *gin.Context) {
 
 	var product Product
 
-	q := "SELECT  p.product_id, p.name, p.description, p.price, p.category_id, cat.name, p.image, p.quantity  FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id WHERE product_id = " + c.Param("id") + ";"
+	// q := "SELECT  p.product_id, p.name, p.description, p.price, p.category_id, cat.name, p.image, p.quantity , AVG(r.rating) as avg_rating FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id LEFT JOIN reviews r ON r.product_id = p.product_id WHERE product_id = " + c.Param("id") + ";"
+
+	q := `
+	SELECT
+		p.product_id, p.name, p.description, p.price,
+		p.category_id, cat.name as category_name, p.image,
+		p.quantity, AVG(reviews.rating) as avg_rating
+	FROM
+		products p
+	INNER JOIN
+		categories cat ON p.category_id = cat.category_id
+	LEFT JOIN
+		reviews ON reviews.product_id = p.product_id
+	WHERE
+		p.product_id = '` + c.Param("id") + `'
+	GROUP BY
+		p.product_id, cat.name;
+	`
 
 	row := database.DB.QueryRow(q)
 
-	err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity)
+	err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity, &product.Rating)
 
 	if helpers.ErrorResponse(c, err, 500) {
 		return
