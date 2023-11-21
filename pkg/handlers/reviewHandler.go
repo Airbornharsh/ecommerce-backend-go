@@ -138,7 +138,23 @@ func CreateReviewHandler(c *gin.Context) {
 
 	review.UserID = user.UserID
 
-	q := "INSERT INTO reviews (user_id, product_id, rating, comment) VALUES ('" + strconv.Itoa(int(user.UserID)) + "', '" + strconv.Itoa(int(review.ProductID)) + "', '" + strconv.Itoa(review.Rating) + "', '" + review.Comment + "') RETURNING review_id"
+	var isReviewed bool
+
+	q := "SELECT EXISTS (SELECT 1 FROM reviews WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND product_id = '" + strconv.Itoa(int(review.ProductID)) + "')"
+
+	err := database.DB.QueryRow(q).Scan(&isReviewed)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	if isReviewed {
+		c.JSON(400, gin.H{
+			"message": "You have already reviewed this product",
+		})
+		return
+	}
+
+	q = "INSERT INTO reviews (user_id, product_id, rating, comment) VALUES ('" + strconv.Itoa(int(user.UserID)) + "', '" + strconv.Itoa(int(review.ProductID)) + "', '" + strconv.Itoa(review.Rating) + "', '" + review.Comment + "') RETURNING review_id"
 
 	rows, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
