@@ -68,7 +68,57 @@ func CreateWishlistHandler(c *gin.Context) {
 }
 
 func UpdateWishlistHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
 
+	var wishlist models.Wishlist
+
+	if err := c.ShouldBindJSON(&wishlist); helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	wishlist.UserID = user.UserID
+
+	var wishlistExists bool
+
+	q := "SELECT EXISTS(SELECT 1 FROM wishlists WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND wishlist_id = '" + c.Param("id") + "' LIMIT 1)"
+
+	err := database.DB.QueryRow(q).Scan(&wishlistExists)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	if !wishlistExists {
+		helpers.ErrorResponse(c, errors.New("not present"), 409)
+		return
+	}
+
+	q = "UPDATE wishlists SET"
+
+	if wishlist.Name != "" {
+		q += " name = '" + wishlist.Name + "',"
+	}
+	if wishlist.DefaultProductID != 0 {
+		q += " defaultproduct_id = '" + strconv.Itoa(int(wishlist.DefaultProductID)) + "',"
+	}
+
+	q = q[:len(q)-1]
+
+	q += " WHERE wishlist_id = '" + c.Param("id") + "'"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "wishlist updated",
+		"token":   token,
+	})
 }
 
 func DeleteWishlistHandler(c *gin.Context) {
