@@ -185,6 +185,47 @@ func CreateReviewHandler(c *gin.Context) {
 }
 
 func UpdateReviewHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
+
+	reviewID := c.Param("id")
+
+	var review models.Review
+
+	if err := c.ShouldBindJSON(&review); helpers.ErrorResponse(c, err, 400) {
+		return
+	}
+
+	review.UserID = user.UserID
+
+	q := "UPDATE reviews SET "
+	if review.Rating != 0 {
+		q += "rating = '" + strconv.Itoa(review.Rating) + "', "
+	}
+	if review.Comment != "" {
+		q += "comment = '" + review.Comment + "', "
+	}
+	q += "updated_at = NOW() WHERE review_id = '" + reviewID + "' RETURNING review_id"
+
+	rows, err := database.DB.Query(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	var updatedReviewID uint
+
+	for rows.Next() {
+		err = rows.Scan(&updatedReviewID)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+	}
+
+	if updatedReviewID == 0 {
+		c.JSON(400, gin.H{
+			"message": "Review not found",
+		})
+		return
+	}
 }
 
 func DeleteReviewHandler(c *gin.Context) {
