@@ -81,15 +81,25 @@ type Payment struct {
 	CreatedAt     time.Time     `json:"created_at"`
 }
 
+type OrderStatus string
+
+const (
+	OrderPending   OrderStatus = "pending"
+	OrderConfirmed OrderStatus = "confirmed"
+	OrderShipped   OrderStatus = "shipped"
+	OrderDelivered OrderStatus = "delivered"
+	OrderCancelled OrderStatus = "cancelled"
+)
+
 type Order struct {
-	OrderID      uint      `json:"order_id"`
-	UserID       uint      `json:"user_id"`
-	TotalAmount  uint      `json:"total_amount"`
-	PaymentID    uint      `json:"payment_id"`
-	ShippingID   uint      `json:"shipping_id"`
-	Status       string    `json:"status"` // "pending", "shipped", "delivered", etc.
-	OrderDate    time.Time `json:"order_date"`
-	DeliveryDate time.Time `json:"delivery_date"`
+	OrderID      uint        `json:"order_id"`
+	UserID       uint        `json:"user_id"`
+	TotalAmount  uint        `json:"total_amount"`
+	PaymentID    uint        `json:"payment_id"`
+	ShippingID   uint        `json:"shipping_id"`
+	Status       OrderStatus `json:"status"` // "pending", "shipped", "delivered", etc.
+	OrderDate    time.Time   `json:"order_date"`
+	DeliveryDate time.Time   `json:"delivery_date"`
 }
 
 type OrderItem struct {
