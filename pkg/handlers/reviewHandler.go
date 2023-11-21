@@ -229,4 +229,35 @@ func UpdateReviewHandler(c *gin.Context) {
 }
 
 func DeleteReviewHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
+
+	reviewID := c.Param("id")
+
+	q := "DELETE FROM reviews WHERE review_id = '" + reviewID + "' AND user_id'" + strconv.Itoa(int(user.UserID)) + "' RETURNING review_id"
+
+	rows, err := database.DB.Query(q)
+
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	var deletedReviewID uint
+
+	for rows.Next() {
+		err = rows.Scan(&deletedReviewID)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+	}
+
+	if deletedReviewID == 0 {
+		c.JSON(400, gin.H{
+			"message": "Review not found",
+		})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Review deleted successfully",
+	})
 }
