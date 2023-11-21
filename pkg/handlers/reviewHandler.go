@@ -43,6 +43,38 @@ func GetAllReviewHandler(c *gin.Context) {
 }
 
 func GetAllProductReviewHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
+
+	productID := c.Param("productId")
+
+	q := "SELECT * FROM reviews WHERE product_id = '" + productID + "'"
+
+	rows, err := database.DB.Query(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	var reviews []models.Review
+
+	for rows.Next() {
+		var review models.Review
+		err = rows.Scan(&review.ReviewID, &review.UserID, &review.ProductID, &review.Rating, &review.Comment)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+		reviews = append(reviews, review)
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Reviews fetched successfully",
+		"token":   token,
+		"reviews": reviews,
+	})
 }
 
 func GetReviewHandler(c *gin.Context) {
