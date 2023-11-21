@@ -204,7 +204,7 @@ func UpdateReviewHandler(c *gin.Context) {
 	if review.Comment != "" {
 		q += "comment = '" + review.Comment + "', "
 	}
-	q += "updated_at = NOW() WHERE review_id = '" + reviewID + "' RETURNING review_id"
+	q += "updated_at = NOW() WHERE review_id = '" + reviewID + "' AND user_id = '" + strconv.Itoa(int(user.UserID)) + "' RETURNING review_id"
 
 	rows, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
