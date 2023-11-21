@@ -122,7 +122,53 @@ func GetAllOrderHandler(c *gin.Context) {
 }
 
 func GetOrderHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
 
+	orderID := c.Param("id")
+
+	var order TempOrder
+
+	q := "SELECT orders.order_id, orders.user_id, orders.total_amount, orders.payment_id, payments.amount, payments.method, payments.status, payments.created_at, orders.shipping_id, shippings.method, addresses.street, addresses.city, addresses.state, addresses.country, addresses.zip_code, addresses.is_default, shippings.estimated_delivery_days, orders.status, orders.order_date, orders.delivery_date FROM orders INNER JOIN payments ON orders.payment_id = payments.payment_id INNER JOIN shippings ON orders.shipping_id = shippings.shipping_id INNER JOIN addresses ON shippings.address_id = addresses.address_id WHERE orders.user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND orders.order_id = '" + orderID + "'"
+
+	err := database.DB.QueryRow(q).Scan(&order.OrderID, &order.UserID, &order.TotalAmount, &order.PaymentID, &order.Amount, &order.PaymentMethod, &order.PaymentStatus, &order.CreatedAt, &order.ShippingID, &order.ShippingMethod, &order.Street, &order.City, &order.State, &order.Country, &order.ZipCode, &order.IsDefault, &order.EstimatedDeliveryDays, &order.OrderStatus, &order.OrderDate, &order.DeliveryDate)
+
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	var products []TempOrderProduct
+
+	q = "SELECT orderitems.product_id, products.name, products.description, products.price, products.category_id, categories.name, products.image, orderitems.quantity FROM orderitems INNER JOIN products ON orderitems.product_id = products.product_id INNER JOIN categories ON products.category_id = categories.category_id WHERE orderitems.order_id = '" + orderID + "'"
+
+	rows, err := database.DB.Query(q)
+
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	for rows.Next() {
+		var product TempOrderProduct
+
+		err := rows.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity)
+
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+		products = append(products, product)
+	}
+
+	order.Products = products
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Order",
+		"token":   token,
+		"order":   order,
+	})
 }
 
 func CreateOrderHandler(c *gin.Context) {
