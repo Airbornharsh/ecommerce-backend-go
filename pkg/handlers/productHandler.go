@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"strconv"
 
 	"github.com/airbornharsh/ecommerce-backend-go/internal/database"
@@ -10,15 +11,15 @@ import (
 )
 
 type Product struct {
-	ProductID   uint    `json:"product_id"`
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Price       uint    `json:"price"`
-	CategoryID  uint    `json:"category_id"`
-	Category    string  `json:"category"`
-	Image       string  `json:"image"`
-	Quantity    uint    `json:"quantity"`
-	Rating      float64 `json:"avg_rating"`
+	ProductID   uint            `json:"product_id"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Price       uint            `json:"price"`
+	CategoryID  uint            `json:"category_id"`
+	Category    string          `json:"category"`
+	Image       string          `json:"image"`
+	Quantity    uint            `json:"quantity"`
+	Rating      sql.NullFloat64 `json:"avg_rating"`
 }
 
 func GetProductsHandler(c *gin.Context) {
@@ -26,7 +27,7 @@ func GetProductsHandler(c *gin.Context) {
 
 	var products []Product
 
-	q := "SELECT p.product_id, p.name, p.description, p.price, p.category_id, cat.name, p.image, p.quantity FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id;"
+	q := "SELECT p.product_id, p.name, p.description, p.price, p.category_id, cat.name as category_name, p.image, p.quantity, AVG(r.rating) as avg_rating FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id LEFT JOIN reviews r ON p.product_id = r.product_id GROUP BY p.product_id, cat.name;"
 
 	row, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -36,7 +37,7 @@ func GetProductsHandler(c *gin.Context) {
 	for row.Next() {
 		var product Product
 
-		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity)
+		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity, &product.Rating)
 		if helpers.ErrorResponse(c, err, 500) {
 			return
 		}
