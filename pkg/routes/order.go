@@ -14,4 +14,5 @@ func OrderInit(user *gin.RouterGroup) {
 	order.POST("/", middlewares.UserTokenVerifyMiddleWare, handlers.CreateOrderHandler)
 	order.PUT("/:id", middlewares.UserTokenVerifyMiddleWare, handlers.UpdateOrderHandler)
 	order.DELETE("/:id", middlewares.UserTokenVerifyMiddleWare, handlers.DeleteOrderHandler)
+	order.GET("/status", handlers.ListOrderStatusHandler)
 }

@@ -305,3 +305,10 @@ func UpdateOrderHandler(c *gin.Context) {
 func DeleteOrderHandler(c *gin.Context) {
 
 }
+
+func ListOrderStatusHandler(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"message":      "List of Order Status",
+		"order_status": []string{"pending", "confirmed", "shipped", "delivered", "cancelled"},
+	})
+}
