@@ -10,8 +10,8 @@ func PaymentInit(user *gin.RouterGroup) {
 	payment := user.Group("/payment")
 
 	payment.POST("/", middlewares.UserTokenVerifyMiddleWare, handlers.CreatePaymentHandler)
-	payment.POST("/failed", middlewares.UserTokenVerifyMiddleWare, handlers.FailedPaymentHandler)
-	payment.POST("/success", middlewares.UserTokenVerifyMiddleWare, handlers.SuccessPaymentHandler)
-	payment.POST("/cancel", middlewares.UserTokenVerifyMiddleWare, handlers.CancelPaymentHandler)
+	payment.POST("/failed/:paymentId", middlewares.UserTokenVerifyMiddleWare, handlers.FailedPaymentHandler)
+	payment.POST("/success/:paymentId", middlewares.UserTokenVerifyMiddleWare, handlers.SuccessPaymentHandler)
+	payment.POST("/cancel/:paymentId", middlewares.UserTokenVerifyMiddleWare, handlers.CancelPaymentHandler)
 
 }
