@@ -40,6 +40,8 @@ func GetClaims(c *gin.Context, tokenString string) (models.User, error) {
 	JWTSECRET := os.Getenv("JWT_SECRET")
 	var user models.User
 
+	tokenString = tokenString[7:]
+
 	verifiedToken, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return []byte(JWTSECRET), nil
 	})
