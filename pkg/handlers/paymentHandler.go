@@ -137,3 +137,9 @@ func ListPaymentStatusHandler(c *gin.Context) {
 		"payment_status": []string{"pending", "failed", "success", "cancelled"},
 	})
 }
+
+func ListPaymentMethodHandler(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"payment_method": []string{"credit_card", "debit_card", "net_banking", "cash_on_delivery", "upi"},
+	})
+}
