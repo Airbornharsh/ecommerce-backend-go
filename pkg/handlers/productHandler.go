@@ -108,7 +108,7 @@ func FilterCategoryHandler(c *gin.Context) {
 
 	var products []Product
 
-	q := "SELECT  p.product_id, p.name, p.description, p.price, p.category_id, cat.name, p.image, p.quantity  FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id WHERE category_id = " + c.Param("category") + ";"
+	q := "SELECT  p.product_id, p.name, p.description, p.price, p.category_id, cat.name as category_name, p.image, p.quantity, AVG(r.rating) as avg_rating  FROM products p INNER JOIN categories cat ON p.category_id = cat.category_id LEFT JOIN reviews r ON r.product_id = p.product_id WHERE p.category_id = " + c.Param("category") + " GROUP BY p.product_id,cat.name;"
 
 	row, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -118,7 +118,7 @@ func FilterCategoryHandler(c *gin.Context) {
 	for row.Next() {
 		var product Product
 
-		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity)
+		err := row.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Category, &product.Image, &product.Quantity, &product.Rating)
 		if helpers.ErrorResponse(c, err, 500) {
 			return
 		}
