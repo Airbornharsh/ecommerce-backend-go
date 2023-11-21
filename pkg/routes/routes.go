@@ -22,4 +22,5 @@ func Init(r *gin.Engine) {
 	CartInit(user)
 	ReviewInit(user)
 	ShippingInit(user)
+	PaymentInit(user)
 }
