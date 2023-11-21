@@ -248,7 +248,7 @@ func DeleteReviewHandler(c *gin.Context) {
 
 	reviewID := c.Param("id")
 
-	q := "DELETE FROM reviews WHERE review_id = '" + reviewID + "' AND user_id'" + strconv.Itoa(int(user.UserID)) + "' RETURNING review_id"
+	q := "DELETE FROM reviews WHERE review_id = '" + reviewID + "' AND user_id = '" + strconv.Itoa(int(user.UserID)) + "' RETURNING review_id"
 
 	rows, err := database.DB.Query(q)
 
