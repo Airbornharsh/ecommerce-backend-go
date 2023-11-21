@@ -110,5 +110,24 @@ func SuccessPaymentHandler(c *gin.Context) {
 }
 
 func CancelPaymentHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
 
+	paymentID := c.Param("paymentId")
+
+	q := "UPDATE payments SET status = 'cancel' WHERE payment_id = '" + paymentID + "' AND user_id = '" + strconv.Itoa(int(user.UserID)) + "';"
+
+	_, err := database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Payment Cancel successfully",
+		"token":   token,
+	})
 }
