@@ -23,4 +23,5 @@ func Init(r *gin.Engine) {
 	ReviewInit(user)
 	ShippingInit(user)
 	PaymentInit(user)
+	OrderInit(user)
 }
