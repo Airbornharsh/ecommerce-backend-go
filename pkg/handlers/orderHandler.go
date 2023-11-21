@@ -267,7 +267,39 @@ func CreateOrderHandler(c *gin.Context) {
 }
 
 func UpdateOrderHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
 
+	var order Order
+
+	if err := c.ShouldBindJSON(&order); helpers.ErrorResponse(c, err, 400) {
+		return
+	}
+
+	orderID := c.Param("id")
+
+	q := "UPDATE orders SET "
+
+	orderStatus, err := helpers.OrderStatusConverter(order.Status)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	q += "status = '" + string(orderStatus) + "' WHERE order_id = '" + orderID + "' ;"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Order updated successfully",
+		"token":   token,
+	})
 }
 
 func DeleteOrderHandler(c *gin.Context) {
