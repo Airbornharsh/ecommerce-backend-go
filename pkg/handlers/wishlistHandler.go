@@ -13,9 +13,14 @@ import (
 func GetAllWishlistHandler(c *gin.Context) {
 	user := c.MustGet("user").(models.User)
 
-	var wishlists []models.Wishlist
+	type Wishlist struct {
+		models.Wishlist
+		ProductImage string `json:"default_product_image"`
+	}
 
-	q := "SELECT wishlist_id, name, user_id, COALESCE(defaultproduct_id, 0) AS converted_defaultproduct_id FROM wishlists WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "'"
+	var wishlists []Wishlist
+
+	q := "SELECT wishlists.wishlist_id, wishlists.name, wishlists.user_id, COALESCE(wishlists.defaultproduct_id, 0) AS converted_defaultproduct_id, COALESCE(products.image, '') AS converted_product_image FROM wishlists LEFT JOIN products ON products.product_id = wishlists.defaultproduct_id WHERE wishlists.user_id = '" + strconv.Itoa(int(user.UserID)) + "'"
 
 	rows, err := database.DB.Query(q)
 	if helpers.ErrorResponse(c, err, 500) {
@@ -23,9 +28,9 @@ func GetAllWishlistHandler(c *gin.Context) {
 	}
 
 	for rows.Next() {
-		var wishlist models.Wishlist
+		var wishlist Wishlist
 
-		err := rows.Scan(&wishlist.WishlistID, &wishlist.Name, &wishlist.UserID, &wishlist.DefaultProductID)
+		err := rows.Scan(&wishlist.WishlistID, &wishlist.Name, &wishlist.UserID, &wishlist.DefaultProductID, &wishlist.ProductImage)
 		if helpers.ErrorResponse(c, err, 500) {
 			return
 		}
