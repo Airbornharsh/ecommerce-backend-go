@@ -231,9 +231,61 @@ func DeleteWishlistHandler(c *gin.Context) {
 }
 
 func UpdateWishlistAddProductHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
 
+	var wishlistExists bool
+
+	q := "SELECT EXISTS (SELECT 1 FROM wishlists WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND wishlist_id = '" + c.Param("id") + "')"
+
+	err := database.DB.QueryRow(q).Scan(&wishlistExists)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	if !wishlistExists {
+		helpers.ErrorResponse(c, errors.New("not present"), 409)
+		return
+	}
+
+	var productExists bool
+
+	q = "SELECT EXISTS (SELECT 1 FROM wishlistitems WHERE product_id = '" + c.Param("productId") + "' AND wishlist_id = '" + c.Param("id") + "')"
+
+	err = database.DB.QueryRow(q).Scan(&productExists)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	if productExists {
+		c.JSON(200, gin.H{
+			"message": "Product Already Added",
+		})
+		return
+	}
+
+	var WishlistItem models.WishlistItem
+
+	WishlistItem.UserID = user.UserID
+
+	q = "INSERT INTO wishlistitems(user_id, product_id, wishlist_id) VALUES ('" + strconv.Itoa(int(user.UserID)) + "','" + c.Param("productId") + "','" + c.Param("id") + "') RETURNING wishlistitem_id,product_id,wishlist_id"
+
+	err = database.DB.QueryRow(q).Scan(&WishlistItem.WishlistItemID, &WishlistItem.ProductID, &WishlistItem.WishlistID)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message":      "Added Product to Wishlist",
+		"token":        token,
+		"wishlistItem": WishlistItem,
+	})
 }
 
 func UpdateWishlistRemoveProductHandler(c *gin.Context) {
-
+	
 }
