@@ -196,7 +196,38 @@ func UpdateWishlistHandler(c *gin.Context) {
 }
 
 func DeleteWishlistHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
 
+	var wishlistExists bool
+
+	q := "SELECT EXISTS(SELECT 1 FROM wishlists WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND wishlist_id = '" + c.Param("id") + "' LIMIT 1)"
+
+	err := database.DB.QueryRow(q).Scan(&wishlistExists)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	if !wishlistExists {
+		helpers.ErrorResponse(c, errors.New("not present"), 409)
+		return
+	}
+
+	q = "DELETE FROM wishlists WHERE wishlist_id = '" + c.Param("id") + "'"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "wishlist deleted",
+		"token":   token,
+	})
 }
 
 func UpdateWishlistAddProductHandler(c *gin.Context) {
