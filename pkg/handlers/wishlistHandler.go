@@ -287,5 +287,52 @@ func UpdateWishlistAddProductHandler(c *gin.Context) {
 }
 
 func UpdateWishlistRemoveProductHandler(c *gin.Context) {
-	
+	user := c.MustGet("user").(models.User)
+
+	var wishlistExists bool
+
+	q := "SELECT EXISTS (SELECT 1 FROM wishlists WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND wishlist_id = '" + c.Param("id") + "')"
+
+	err := database.DB.QueryRow(q).Scan(&wishlistExists)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	if !wishlistExists {
+		helpers.ErrorResponse(c, errors.New("not present"), 409)
+		return
+	}
+
+	var productExists bool
+
+	q = "SELECT EXISTS (SELECT 1 FROM wishlistitems WHERE product_id = '" + c.Param("productId") + "' AND wishlist_id = '" + c.Param("id") + "')"
+
+	err = database.DB.QueryRow(q).Scan(&productExists)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	if !productExists {
+		c.JSON(200, gin.H{
+			"message": "Product Not Present",
+		})
+		return
+	}
+
+	q = "DELETE FROM wishlistitems WHERE product_id = '" + c.Param("productId") + "' AND wishlist_id = '" + c.Param("id") + "'"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "Removed Product from Wishlist",
+		"token":   token,
+	})
 }
