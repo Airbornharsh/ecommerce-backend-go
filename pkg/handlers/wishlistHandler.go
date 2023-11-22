@@ -130,9 +130,17 @@ func CreateWishlistHandler(c *gin.Context) {
 	}
 
 	err = database.DB.QueryRow(q).Scan(&wishlist.WishlistID)
-
 	if helpers.ErrorResponse(c, err, 500) {
 		return
+	}
+
+	if wishlist.DefaultProductID != 0 {
+		q = "INSERT INTO wishlistitems (user_id, product_id, wishlist_id) VALUES ('" + strconv.Itoa(int(user.UserID)) + "', '" + strconv.Itoa(int(wishlist.DefaultProductID)) + "', '" + strconv.Itoa(int(wishlist.WishlistID)) + "')"
+
+		_, err = database.DB.Exec(q)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
 	}
 
 	token, err := helpers.GenerateToken(&user)
