@@ -296,16 +296,16 @@ func UpdateWishlistAddProductHandler(c *gin.Context) {
 func UpdateWishlistRemoveProductHandler(c *gin.Context) {
 	user := c.MustGet("user").(models.User)
 
-	var wishlistExists bool
+	var wishlist models.Wishlist
 
-	q := "SELECT EXISTS (SELECT 1 FROM wishlists WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND wishlist_id = '" + c.Param("id") + "')"
+	q := "SELECT wishlist_id, name, user_id, COALESCE(defaultproduct_id, 0) AS converted_defaultproduct_id FROM wishlists WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND wishlist_id = '" + c.Param("id") + "'"
 
-	err := database.DB.QueryRow(q).Scan(&wishlistExists)
+	err := database.DB.QueryRow(q).Scan(&wishlist.WishlistID, &wishlist.Name, &wishlist.UserID, &wishlist.DefaultProductID)
 	if helpers.ErrorResponse(c, err, 500) {
 		return
 	}
 
-	if !wishlistExists {
+	if wishlist.WishlistID == 0 {
 		helpers.ErrorResponse(c, errors.New("not present"), 409)
 		return
 	}
@@ -327,6 +327,13 @@ func UpdateWishlistRemoveProductHandler(c *gin.Context) {
 	}
 
 	q = "DELETE FROM wishlistitems WHERE product_id = '" + c.Param("productId") + "' AND wishlist_id = '" + c.Param("id") + "'"
+
+	_, err = database.DB.Exec(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	q = "UPDATE wishlists SET defaultproduct_id = (SELECT product_id FROM wishlistitems WHERE wishlist_id = '" + c.Param("id") + "' LIMIT 1) WHERE wishlist_id = '" + c.Param("id") + "'"
 
 	_, err = database.DB.Exec(q)
 	if helpers.ErrorResponse(c, err, 500) {
