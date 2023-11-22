@@ -39,14 +39,57 @@ func GetAllWishlistHandler(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"message": "wishlists fetched",
-		"token":   token,
-		"data":    wishlists,
+		"message":   "wishlists fetched",
+		"token":     token,
+		"wishlists": wishlists,
 	})
 }
 
 func GetWishlistHandler(c *gin.Context) {
+	user := c.MustGet("user").(models.User)
 
+	type Wishlist struct {
+		models.Wishlist
+		Products []models.Product `json:"products"`
+	}
+
+	var wishlist Wishlist
+
+	q := "SELECT wishlist_id, name, user_id, COALESCE(defaultproduct_id, 0) AS converted_defaultproduct_id FROM wishlists WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND wishlist_id = '" + c.Param("id") + "'"
+
+	err := database.DB.QueryRow(q).Scan(&wishlist.WishlistID, &wishlist.Name, &wishlist.UserID, &wishlist.DefaultProductID)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	q = "SELECT product_id, name, description, price, category_id, image, quantity FROM products  WHERE product_id IN (SELECT product_id FROM wishlistitems WHERE user_id = '" + strconv.Itoa(int(user.UserID)) + "' AND wishlist_id = '" + c.Param("id") + "')"
+
+	rows, err := database.DB.Query(q)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	for rows.Next() {
+		var product models.Product
+
+		err := rows.Scan(&product.ProductID, &product.Name, &product.Description, &product.Price, &product.CategoryID, &product.Image, &product.Quantity)
+		if helpers.ErrorResponse(c, err, 500) {
+			return
+		}
+
+		wishlist.Products = append(wishlist.Products, product)
+	}
+
+	token, err := helpers.GenerateToken(&user)
+	if helpers.ErrorResponse(c, err, 500) {
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"message": "wishlist fetched",
+		"token":   token,
+		"data":    wishlist,
+	})
 }
 
 func CreateWishlistHandler(c *gin.Context) {
