@@ -1,0 +1,9 @@
+{
+  "trailingSlash": false,
+  "rewrites": [
+    {
+      "source": "./(.*)",
+      "destination": "./cmd/ecommerce-backend-go/main.go"
+    }
+  ]
+}
