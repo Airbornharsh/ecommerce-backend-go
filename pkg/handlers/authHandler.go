@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"fmt"
+
 	"github.com/airbornharsh/ecommerce-backend-go/internal/database"
 	"github.com/airbornharsh/ecommerce-backend-go/pkg/helpers"
 	"github.com/airbornharsh/ecommerce-backend-go/pkg/models"
@@ -15,6 +17,8 @@ func RegisterHandler(c *gin.Context) {
 	if helpers.ErrorResponse(c, err, 400) {
 		return
 	}
+
+	fmt.Println(user)
 
 	q := `SELECT EXISTS (SELECT 1 FROM users WHERE email = '` + user.Email + `' OR phone_number = '` + user.PhoneNumber + `');`
 
