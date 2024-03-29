@@ -3,7 +3,6 @@ package database
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -15,7 +14,7 @@ var DB *sql.DB
 func DBInit() {
 	err := godotenv.Load(".env")
 	if err != nil {
-		log.Fatal("Error loading .env file")
+		fmt.Println("Error loading .env file")
 	}
 
 	DB_Uri := os.Getenv("DB_URI")
@@ -23,7 +22,7 @@ func DBInit() {
 	db, err := sql.Open("postgres", DB_Uri)
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	DB = db
@@ -31,7 +30,7 @@ func DBInit() {
 	err = DB.Ping()
 
 	if err != nil {
-		panic(err)
+		fmt.Println(err)
 	}
 
 	fmt.Println("Connected to database")
